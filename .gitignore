@@ -16,7 +16,6 @@ conda-meta/
 
 # Environment Variables
 .env
-.env.*
 
 # VS Code
 .vscode/
