@@ -33,4 +33,10 @@ async def upload_data(project_id: str, app_settings: Settings = Depends(get_sett
         logger.error(f"Error occurred while uploading file: {e}")
         return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"signal": ResponseStatus.ERROR.value})
 
-    return JSONResponse(content={"signal": ResponseStatus.SUCCESS.value})  # ← moved outside except
+        return JSONResponse(content={"signal": ResponseStatus.SUCCESS.value})  # ← moved outside except
+
+    return JSONResponse(
+        content={
+        "signal": ResponseStatus.SUCCESS.value,
+        "file_name": os.path.basename(file_location),
+    })
