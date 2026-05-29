@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     APP_DESCRIPTION: str
     FILE_ALLOWED_TYPES: List[str] = ["application/pdf", "text/plain"]
     FILE_MAX_SIZE: int
-    FiLE_DEFAULT_CHUNCK_SIZE: int
+    FILE_DEFAULT_CHUNK_SIZE: int
 
     model_config = SettingsConfigDict(
         env_file=".env",
