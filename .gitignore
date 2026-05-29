@@ -1,0 +1,74 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# Conda
+.conda/
+conda-meta/
+
+# Environment Variables
+.env
+.env.*
+
+# VS Code
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# RAG Data (optional)
+chroma_db/
+vectorstore/
+faiss_index/
+index/
+storage/
+
+# Model Files
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+
+# Cache
+.cache/
+.cache/**
+.huggingface/
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+
+# Secrets
+secrets.json
+credentials.json
+
+# Node (if frontend exists)
+node_modules/
+.next/
