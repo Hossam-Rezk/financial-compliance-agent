@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     # Text splitter settings (characters)
     FILE_DEFAULT_CHUNK_SIZE: int = 512
     FILE_DEFAULT_OVERLAP_SIZE: int = 50
+    MONGO_DB_URL: str
+    MONGO_DATABASE: str
 
     model_config = SettingsConfigDict(
         env_file=".env",
