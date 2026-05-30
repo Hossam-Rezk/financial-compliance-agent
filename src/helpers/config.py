@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     FILE_ALLOWED_TYPES: List[str] = ["application/pdf", "text/plain"]
     FILE_MAX_SIZE: int
     FILE_DEFAULT_CHUNK_SIZE: int
+    FILE_DEFAULT_OVERLAP_SIZE: int 
 
     model_config = SettingsConfigDict(
         env_file=".env",

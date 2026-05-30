@@ -32,3 +32,4 @@ class DataController(BaseController):
         # Remove any special characters and spaces from the filename
         cleaned_filename = re.sub(r'[^a-zA-Z0-9_.-]', '_', filename)
         return cleaned_filename
+    
