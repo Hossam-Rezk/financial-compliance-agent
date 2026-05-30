@@ -13,9 +13,6 @@ class DataController(BaseController):
     def ValidateFile(self, file:UploadFile):
         if file.content_type not in self.app_settings.FILE_ALLOWED_TYPES:
             return False, ResponseStatus.file_not_allowed.value
-        if file.size > self.app_settings.FILE_MAX_SIZE:
-            return False, ResponseStatus.file_too_large.value
-        
         return True, ResponseStatus.file_valid.value
     
     def generate_unique_file(self, orig_filename: str, project_id: str):
