@@ -13,12 +13,12 @@ class ProcessController(BaseController):
         self.project_id = project_id
         self.project_path = ProjectController().get_project_dir(project_id=project_id)
 
-    def get_file_extension(self, file_id: str):
-        return os.path.splitext(file_id)[1].lower()
+    def get_file_extension(self, file_name: str):
+        return os.path.splitext(file_name)[1].lower()
 
-    def get_file_loader(self, file_id: str):
-        file_ext = self.get_file_extension(file_id=file_id)
-        file_path = os.path.join(self.project_path, file_id)
+    def get_file_loader(self, file_name: str):
+        file_ext = self.get_file_extension(file_name=file_name)
+        file_path = os.path.join(self.project_path, file_name)
         if file_ext == processEnum.ProcessingEnum.PDF.value:
             return PyMuPDFLoader(file_path)
         elif file_ext == processEnum.ProcessingEnum.TXT.value:
@@ -26,15 +26,15 @@ class ProcessController(BaseController):
         else:
             raise ValueError(f"Unsupported file type: {file_ext}")
 
-    def get_file_content(self, file_id: str):
+    def get_file_content(self, file_name: str):
         try:
-            loader = self.get_file_loader(file_id=file_id)
+            loader = self.get_file_loader(file_name=file_name)
             documents = loader.load()
             return documents
         except Exception as e:
             raise ValueError(f"Error processing file: {e}")
 
-    def process_file_content(self, file_content: list, file_id: str, chunk_size: int = 100, overlap_size: int = 20):
+    def process_file_content(self, file_content: list, chunk_size: int = 100, overlap_size: int = 20):
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
             chunk_overlap=overlap_size
