@@ -12,7 +12,7 @@ services:
       - backend
 
   qdrant:
-    image: qdrant/qdrant:1.9.2
+    image: qdrant/qdrant:v1.18.1
     container_name: qdrant
     ports:
       - "6333:6333"
