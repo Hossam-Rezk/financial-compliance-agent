@@ -9,6 +9,8 @@ import aiofiles
 import logging
 from src.routes.schemes import ProcessRequest
 from src.models.ProjectModel import ProjectModel
+from src.models.ChunkModel import ChunkModel
+from src.models.DataChunk import DataChunk
 
 logger = logging.getLogger('uvicorn.error')
 
@@ -20,12 +22,12 @@ data_router = APIRouter(
 
 @data_router.post("/upload/{project_id}")
 async def upload_data(
-    Request: Request,
+    request: Request,
     project_id: str,
     file: UploadFile = File(...),
     app_settings: Settings = Depends(get_settings)
 ):
-    project_model = ProjectModel(database_client=Request.app.db_client)
+    project_model = ProjectModel(database_client=request.app.db_client)
     project = await project_model.get_project_or_create_one(project_id=project_id)
     data_controller = DataController()
     is_valid, message = data_controller.ValidateFile(file=file)
@@ -43,7 +45,6 @@ async def upload_data(
 
     try:
         async with aiofiles.open(file_location, 'wb') as out_file:
-            # Bug 2 fix: use FILE_UPLOAD_CHUNK_SIZE for streaming, not text chunk size
             while chunk := await file.read(app_settings.FILE_UPLOAD_CHUNK_SIZE):
                 await out_file.write(chunk)
     except Exception as e:
@@ -57,20 +58,24 @@ async def upload_data(
 
     return JSONResponse(content={
         "signal": ResponseStatus.SUCCESS.value,
-        "file_name": file_name,   
+        "file_name": file_name,
         "project_id": str(project.id)
     })
 
 
 @data_router.post("/process/{project_id}")
 async def process_endpoint(
+    request: Request,
     project_id: str,
-    request: ProcessRequest,
-    app_settings: Settings = Depends(get_settings)
+    body: ProcessRequest,
+    app_settings: Settings = Depends(get_settings),
 ):
-    file_name = request.file_name
-    chunk_size = request.chunk_size or app_settings.FILE_DEFAULT_CHUNK_SIZE
-    overlap_size = request.overlap_size or app_settings.FILE_DEFAULT_OVERLAP_SIZE
+    project_model = ProjectModel(database_client=request.app.db_client)
+    project = await project_model.get_project_or_create_one(project_id=project_id)
+
+    file_name = body.file_name
+    chunk_size = body.chunk_size or app_settings.FILE_DEFAULT_CHUNK_SIZE
+    overlap_size = body.overlap_size or app_settings.FILE_DEFAULT_OVERLAP_SIZE
 
     process_controller = ProcessController(project_id=project_id)
 
@@ -90,7 +95,20 @@ async def process_endpoint(
             }
         )
 
+    file_chunks_records = [
+        DataChunk(
+            chunk_text=chunk.page_content,
+            chunk_metadata=chunk.metadata,
+            chunk_order=index + 1,
+            chunk_project_id=project.id
+        )
+        for index, chunk in enumerate(file_chunks)
+    ]
+
+    chunk_model = ChunkModel(database_client=request.app.db_client)
+    no_records = await chunk_model.insert_many_chunks(chunks=file_chunks_records)
+
     return JSONResponse(content={
         "signal": ResponseStatus.SUCCESS.value,
-        "file_chunks": len(file_chunks)
+        "file_chunks": no_records
     })
