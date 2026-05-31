@@ -14,7 +14,6 @@ ENV/
 .conda/
 conda-meta/
 DEPLOYMENT.md
-
 # Environment Variables
 .env
 files
@@ -72,3 +71,5 @@ credentials.json
 # Node (if frontend exists)
 node_modules/
 .next/
+
+Financial_Compliance_Agent_Documentation.pdf
