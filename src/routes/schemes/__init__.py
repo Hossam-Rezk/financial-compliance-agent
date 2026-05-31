@@ -1,2 +1,2 @@
 from .data import ProcessRequest
-from .nlp import QueryRequest, AnalyzeRequest
+from .nlp import QueryRequest, AnalyzeRequest, ChatRequest

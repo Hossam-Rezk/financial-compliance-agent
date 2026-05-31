@@ -13,6 +13,7 @@ ENV/
 # Conda
 .conda/
 conda-meta/
+DEPLOYMENT.md
 
 # Environment Variables
 .env

@@ -57,3 +57,37 @@ class NLPController(BaseController):
         )
 
         return report
+
+    async def chat(self, query: str, project_id: str, chat_history: list = None) -> str:
+        chunks = await RetrieverAgent().run(
+            query=query,
+            project_id=project_id,
+            top_k=3,
+        )
+        
+        context_block = "\n\n".join(
+            f"[Excerpt {i+1}]: {c['chunk_text']}" for i, c in enumerate(chunks)
+        )
+        
+        system_prompt = (
+            "You are a helpful financial compliance AI assistant. You answer the user's questions "
+            "based strictly on the provided document excerpts. If the answer is not in the excerpts, "
+            "say that you do not know. Do not hallucinate."
+        )
+        
+        user_prompt = f"Context excerpts:\n{context_block}\n\nUser Question: {query}"
+        
+        # Here we could pass chat_history if we updated OllamaProvider to take full message history, 
+        # but for simplicity we will just append it to the prompt or let the single prompt suffice.
+        # To keep it robust without modifying OllamaProvider heavily, we pass context + query.
+        
+        if chat_history and len(chat_history) > 0:
+            history_text = "\n".join([f"{msg['role']}: {msg['content']}" for msg in chat_history])
+            user_prompt = f"Chat History:\n{history_text}\n\n" + user_prompt
+            
+        response = await self.ollama.generate(
+            prompt=user_prompt,
+            system_prompt=system_prompt
+        )
+        
+        return response
