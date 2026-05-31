@@ -72,4 +72,5 @@ credentials.json
 node_modules/
 .next/
 
+# Project Documentation
 Financial_Compliance_Agent_Documentation.pdf
