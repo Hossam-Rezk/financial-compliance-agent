@@ -1,6 +1,10 @@
 from .BaseController import BaseController
 from src.stores.llm.OllamaProvider import OllamaProvider
 from src.stores.vectordb.QdrantProvider import QdrantProvider
+from src.agents.RetrieverAgent import RetrieverAgent
+from src.agents.ComplianceCheckerAgent import ComplianceCheckerAgent
+from src.agents.RiskScorerAgent import RiskScorerAgent
+from src.agents.ReportGeneratorAgent import ReportGeneratorAgent
 
 
 class NLPController(BaseController):
@@ -29,3 +33,27 @@ class NLPController(BaseController):
             project_id=project_id,
             top_k=top_k,
         )
+
+    async def analyze(
+        self,
+        query: str,
+        project_id: str,
+        top_k: int = 5,
+    ) -> dict:
+        chunks = await RetrieverAgent().run(
+            query=query,
+            project_id=project_id,
+            top_k=top_k,
+        )
+
+        findings = await ComplianceCheckerAgent().run(chunks=chunks)
+
+        scored_findings = await RiskScorerAgent().run(findings=findings)
+
+        report = await ReportGeneratorAgent().run(
+            query=query,
+            project_id=project_id,
+            scored_findings=scored_findings,
+        )
+
+        return report

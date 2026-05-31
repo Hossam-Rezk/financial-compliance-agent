@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
 import logging
-from src.routes.schemes.nlp import QueryRequest
+from src.routes.schemes.nlp import QueryRequest, AnalyzeRequest
 from src.controllers.NLPController import NLPController
 from src.models.enums.ResponsEnums import ResponseStatus
 
@@ -33,4 +33,30 @@ async def query_endpoint(project_id: str, request: QueryRequest):
     return JSONResponse(content={
         "signal": ResponseStatus.SUCCESS.value,
         "results": results,
+    })
+
+
+@nlp_router.post("/analyze/{project_id}")
+async def analyze_endpoint(project_id: str, request: AnalyzeRequest):
+    nlp_controller = NLPController()
+
+    try:
+        report = await nlp_controller.analyze(
+            query=request.query,
+            project_id=project_id,
+            top_k=request.top_k,
+        )
+    except Exception as e:
+        logger.error(f"Compliance analysis failed: {e}")
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "signal": ResponseStatus.ERROR.value,
+                "message": str(e),
+            },
+        )
+
+    return JSONResponse(content={
+        "signal": ResponseStatus.SUCCESS.value,
+        "report": report,
     })
