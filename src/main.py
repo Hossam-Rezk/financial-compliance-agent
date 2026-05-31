@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from src.routes import base
 from src.routes import data
 from motor.motor_asyncio import AsyncIOMotorClient
-from helper.config import Settings, get_settings
+from src.helpers.config import Settings, get_settings
 
 
 load_dotenv(".env")
