@@ -1,5 +1,5 @@
 # pyrefly: ignore [missing-import]
-from pydantic import BaseModel, Field,validator
+from pydantic import BaseModel, Field, validator, ConfigDict
 from typing import Optional
 # pyrefly: ignore [missing-import]
 from bson.objectid import ObjectId
@@ -11,7 +11,4 @@ class DataChunk(BaseModel):
     chunk_order: int = Field(..., description="Order of the chunk in the original document", gt=0)
     chunk_project_id: ObjectId
     
-    class Config:
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        populate_by_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, json_encoders={ObjectId: str}, populate_by_name=True)

@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from src.stores.llm.OllamaProvider import OllamaProvider
 from src.stores.rules.RulesProvider import get_rules
 
@@ -63,7 +63,7 @@ Write a 3-5 sentence executive summary suitable for a compliance officer.
         return {
             "project_id": project_id,
             "query": query,
-            "generated_at": datetime.utcnow().isoformat() + "Z",
+            "generated_at": datetime.now(timezone.utc).isoformat() + "Z",
             "total_findings": len(scored_findings),
             "severity_summary": severity_summary,
             "overall_risk": overall_risk,

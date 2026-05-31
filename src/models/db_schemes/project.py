@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, ConfigDict
 from typing import Optional
 from bson.objectid import ObjectId
 
@@ -12,7 +12,4 @@ class Project(BaseModel):
             raise ValueError("Project ID must be alphanumeric")
         return value
     
-    class Config:
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        populate_by_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, json_encoders={ObjectId: str}, populate_by_name=True)

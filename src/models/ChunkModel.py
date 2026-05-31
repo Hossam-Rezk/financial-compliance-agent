@@ -13,10 +13,10 @@ class ChunkModel(BaseDataModel):
         chunk.id = result.inserted_id
         return chunk
 
-    async def get_chunks_by_project_id(self, project_id: str):
+    async def get_chunks_by_project_id(self, project_id: str, limit: int = 100, skip: int = 0):
         result = await self.collection.find(
             {"chunk_metadata.project_id": project_id}
-        ).to_list(length=None)
+        ).skip(skip).limit(limit).to_list(length=None)
         if not result:
             return []
         return [DataChunk(**doc) for doc in result]

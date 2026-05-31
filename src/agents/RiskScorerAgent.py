@@ -1,6 +1,8 @@
 import json
+import logging
 from src.stores.llm.OllamaProvider import OllamaProvider
 
+logger = logging.getLogger("uvicorn.error")
 
 class RiskScorerAgent:
 
@@ -42,13 +44,15 @@ Return only the JSON array, no markdown, no explanation.
         response = await self.ollama.generate(
             prompt=user_prompt,
             system_prompt=system_prompt,
+            format="json",
         )
 
         try:
             scored = json.loads(response.strip())
             if not isinstance(scored, list):
                 scored = findings
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse LLM response as JSON in RiskScorerAgent: {response}. Error: {e}")
             scored = findings
 
         return scored

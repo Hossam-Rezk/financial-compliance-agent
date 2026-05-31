@@ -5,22 +5,28 @@ from src.routes import nlp
 from motor.motor_asyncio import AsyncIOMotorClient
 from src.helpers.config import get_settings
 from src.stores.vectordb.QdrantProvider import QdrantProvider
+from contextlib import asynccontextmanager
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 load_dotenv(".env")
 
-app = FastAPI()
+limiter = Limiter(key_func=get_remote_address)
 
-@app.on_event("startup")
-async def startup_db_client():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     settings = get_settings()
     app.mongodb_connection = AsyncIOMotorClient(settings.MONGO_DB_URL)
     app.db_client = app.mongodb_connection[settings.MONGO_DATABASE]
     qdrant = QdrantProvider()
     qdrant.init_collection()
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
+    yield
     app.mongodb_connection.close()
+
+app = FastAPI(lifespan=lifespan)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.include_router(base.base_router)
 app.include_router(data.data_router)

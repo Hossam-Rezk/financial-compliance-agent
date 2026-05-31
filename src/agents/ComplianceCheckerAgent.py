@@ -1,7 +1,9 @@
 import json
+import logging
 from src.stores.llm.OllamaProvider import OllamaProvider
 from src.stores.rules.RulesProvider import get_rules
 
+logger = logging.getLogger("uvicorn.error")
 
 class ComplianceCheckerAgent:
 
@@ -47,13 +49,15 @@ Return only the JSON array, no markdown, no explanation.
         response = await self.ollama.generate(
             prompt=user_prompt,
             system_prompt=system_prompt,
+            format="json",
         )
 
         try:
             findings = json.loads(response.strip())
             if not isinstance(findings, list):
                 findings = []
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse LLM response as JSON in ComplianceCheckerAgent: {response}. Error: {e}")
             findings = []
 
         return findings
