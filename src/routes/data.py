@@ -10,7 +10,8 @@ import logging
 from src.routes.schemes import ProcessRequest
 from src.models.ProjectModel import ProjectModel
 from src.models.ChunkModel import ChunkModel
-from src.models.DataChunk import DataChunk
+from src.models.db_schemes.Data_chunk import DataChunk
+from src.controllers.NLPController import NLPController
 
 logger = logging.getLogger('uvicorn.error')
 
@@ -106,9 +107,15 @@ async def process_endpoint(
     ]
 
     chunk_model = ChunkModel(database_client=request.app.db_client)
-    no_records = await chunk_model.insert_many_chunks(chunks=file_chunks_records)
+    await chunk_model.insert_many_chunks(chunks=file_chunks_records)
+
+    nlp_controller = NLPController()
+    await nlp_controller.embed_and_upsert(
+        chunks=file_chunks,
+        project_id=project_id,
+    )
 
     return JSONResponse(content={
         "signal": ResponseStatus.SUCCESS.value,
-        "file_chunks": no_records
+        "file_chunks": len(file_chunks),
     })
