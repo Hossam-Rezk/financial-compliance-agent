@@ -1,6 +1,7 @@
 from __future__ import annotations
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import List
+from functools import lru_cache
 
 class Settings(BaseSettings):
     APP_NAME: str
@@ -18,11 +19,18 @@ class Settings(BaseSettings):
     FILE_DEFAULT_OVERLAP_SIZE: int = 50
     MONGO_DB_URL: str
     MONGO_DATABASE: str
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    OLLAMA_MODEL: str = "mistral"
+    OLLAMA_EMBED_MODEL: str = "nomic-embed-text"
+    QDRANT_URL: str = "http://localhost:6333"
+    QDRANT_COLLECTION_NAME: str = "financial_compliance"
+    VECTOR_EMBEDDING_SIZE: int = 768
 
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8"
     )
 
+@lru_cache
 def get_settings():
     return Settings()
