@@ -14,4 +14,5 @@ class Project(BaseModel):
     
     class Config:
         arbitrary_types_allowed = True
-        populate_by_name = True  # allows using both 'id' and '_id'
+        json_encoders = {ObjectId: str}
+        populate_by_name = True

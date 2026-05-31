@@ -14,10 +14,12 @@ class ChunkModel(BaseDataModel):
         return chunk
 
     async def get_chunks_by_project_id(self, project_id: str):
-        result = await self.collection.find({"chunk_metadata.project_id": project_id}).to_list(length=None)
-        if result is None:
-            return None
-        return DataChunk(**result)
+        result = await self.collection.find(
+            {"chunk_metadata.project_id": project_id}
+        ).to_list(length=None)
+        if not result:
+            return []
+        return [DataChunk(**doc) for doc in result]
     async def insert_many_chunks(self, chunks: list, batch_size: int = 100):
         for i in range(0, len(chunks), batch_size):
             batch = chunks[i:i + batch_size]
