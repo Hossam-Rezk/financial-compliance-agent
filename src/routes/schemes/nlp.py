@@ -10,3 +10,8 @@ class QueryRequest(BaseModel):
 class AnalyzeRequest(BaseModel):
     query: str = Field(..., min_length=1, description="The compliance query to analyze")
     top_k: Optional[int] = Field(default=5, ge=1, le=20)
+
+
+class ChatRequest(BaseModel):
+    query: str = Field(..., min_length=1)
+    chat_history: Optional[list[dict]] = Field(default=[])
